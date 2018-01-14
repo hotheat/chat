@@ -87,6 +87,8 @@
     };
 
     var subscribe = function() {
+        // sse 对象是一个和服务器不会断开的 HTTP 请求, 但仅限于服务器向客户端推送数据
+        // 每当服务器发 onmessage 时，这个函数都会被调用
       var sse = new EventSource("/subscribe");
       sse.onmessage = function(e) {
         log(e, e.data);
@@ -187,7 +189,7 @@
           longTimeAgo();
       }, 1000);
     };
-
+    // 主程序入口
     $(document).ready(function(){
       __main();
     });
