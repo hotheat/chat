@@ -10,7 +10,8 @@ import json
 subcribe 函数用来做 sse 的，stream() 函数不会结束，
 不会返回，python 没有原生的多线程，
 gunicorn 是一个 python 的 web 服务器，可以启动 python 程序
-有 100 个人同时在线，服务就会有100个进程在服务，同时监听 redis 频道
+每次客户端发送的请求, gunicorn 会分配新的 redischat 进程，来处理请求
+有 100 个人同时在线，服务就会有100个进程在服务，同时监听一个 redis 频道
 使用 gunicorn 启动代码，实现并发
 实际上，是 gunicorn 接管了服务器，我们的程序只是提供数据，程序挂了，但 gunicorn 在运行
 # 使用 gunicorn 启动
@@ -24,9 +25,10 @@ gunicorn --log-level debug --access-logfile gunicorn.log --worker-class=gevent -
 # 连接上本机的 redis 服务器
 # 所以要先打开 redis 服务器
 # sqlite 和 mysql 写入和读取数据都要到硬盘读写，速度没那么快
-# redis 数据库特点：内存数据库，至少比硬盘速度快 10倍
-# redis 是一个独立的服务器，我们只做了发消息，收消息，具体逻辑 redis 做的，我们只是发函数
+# redis 特点：是一个内存数据库，至少比硬盘速度快 10倍
+# redis 是一个独立的服务器，我们只是用客户端连上服务器，发消息，收消息，具体逻辑 redis 做的，我们只是发数据
 # 实际上是一个存储字典的服务器，字典存储很快
+# 有个特殊的功能——发布订阅功能
 red = redis.Redis(host='localhost', port=6379, db=0)
 print('redis', red)
 
